@@ -1,6 +1,6 @@
 #!/bin/sh
 VERSION="0.7.3"
-ARCH=$(uname -m)
+ARCH=$(uname)
 URL="https://github.com/vchain-us/vcn/releases/download/v$VERSION/vcn-v$VERSION-$ARCH-10.6-amd64"
 
 check_curl(){
@@ -14,24 +14,17 @@ check_curl(){
 check_os() {
 	if [ "$(uname)" = "Linux" ] ; then
 		PKG="linux"
-		echo "Running on Linux"
-
 	elif [ "$(uname)" = "Darwin" ] ; then
 		PKG="darwin"
-		echo "Running on Apple"
 	else
-		echo "Unknown operating system"
-		echo "Please select your operating system:"
-		echo "	     linux"
-		echo "	     MacOS"
-		read PKG
+		echo "Unknown operating system."
+		exit 1
 	fi
 }
 
 install() {
   TMPDIR=$(mktemp -d) && cd $TMPDIR
 	curl --connect-timeout 100 -L $URL >> vcn
-	echo "Done. You can run now: $ vcn"
 
 	if [ "$PKG" = "linux" ] ; then
 	  sudo cp $TMPDIR/vcn /usr/bin && sudo chmod +x /usr/bin/vcn
@@ -55,3 +48,4 @@ echo "Please wait. We are downloading and installing the cli app for you..."
 check_os
 install
 cleanup
+echo "🎉 Done. You can run now: $ vcn"
