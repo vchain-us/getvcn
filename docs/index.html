@@ -1,5 +1,4 @@
 #!/bin/sh
-VERSION="0.7.3"
 ARCH=$(uname)
 
 check_curl(){
@@ -8,6 +7,10 @@ check_curl(){
 			echo '"curl" binary not found, please install and retry'
 			exit 1
 	fi
+}
+
+get_latest_version(){
+	V=$(curl --connect-timeout 100 -L -s "https://api.codenotary.io/foundation/v1/version/vcn/latest" | jq '.release')
 }
 
 check_os() {
@@ -21,13 +24,13 @@ check_os() {
 	fi
 }
 
-get_url(){
+generate_url(){
 	if [ "$PKG" = "linux" ] ; then
-		URL="https://github.com/vchain-us/vcn/releases/download/v$VERSION/vcn-v$VERSION-$ARCH-amd64"
+		URL="https://github.com/vchain-us/vcn/releases/download/$VERSION/vcn-$VERSION-$ARCH-amd64"
 	fi
 
 	if [ "$PKG" = "darwin" ] ; then
-		URL="https://github.com/vchain-us/vcn/releases/download/v$VERSION/vcn-v$VERSION-$ARCH-10.6-amd64"
+		URL="https://github.com/vchain-us/vcn/releases/download/$VERSION/vcn-$VERSION-$ARCH-10.6-amd64"
 	fi
 }
 
@@ -50,12 +53,16 @@ cleanup() {
 }
 
 check_curl
+check_os
 echo  "";
 echo "CodeNotary vcn CLI - Install"
 echo "----------------------------"
-echo "Please wait. We are downloading and installing the cli app for you..." 
-check_os
-get_url
+echo "- Checking for latest release.." 
+get_latest_version
+echo "- Downloading and installing vcn $V for you..."
+generate_url
 install
 cleanup
-echo "🎉 Done. You can run now: $ vcn"
+echo "";
+echo "🎉 Done."
+echo "You can run now: $ vcn"
