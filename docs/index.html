@@ -45,17 +45,23 @@ cleanup() {
   rmdir $TMPDIR
 }
 
-check_curl
-check_os
-echo  "";
-echo "CodeNotary vcn CLI - Install"
-echo "----------------------------"
-echo "- Checking for latest release.." 
-get_latest_version
-echo "- Downloading and installing vcn $V for you..."
-generate_url
-install
-cleanup
-echo "";
-echo "🎉 Done."
-echo "You can run now: $ vcn"
+do_install() {
+	check_curl
+	check_os
+	echo  "";
+	echo "CodeNotary vcn CLI - Install"
+	echo "----------------------------"
+	echo "- Checking for latest release.." 
+	get_latest_version
+	echo "- Downloading and installing vcn $V for you..."
+	generate_url
+	install
+	cleanup
+	echo "";
+	echo "🎉 Done."
+	echo "You can run now: $ vcn"
+}
+
+# wrapped up in a function so that we have some protection against only getting
+# half the file during "curl | sh"
+do_install
