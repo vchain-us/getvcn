@@ -35,16 +35,9 @@ generate_url(){
 }
 
 install() {
-  TMPDIR=$(mktemp -d) && cd $TMPDIR
+	TMPDIR=$(mktemp -d) && cd $TMPDIR
 	curl --connect-timeout 100 -L $URL >> vcn
-
-	if [ "$PKG" = "linux" ] ; then
-	  sudo cp $TMPDIR/vcn /usr/bin && sudo chmod +x /usr/bin/vcn
-	fi
-
-	if [ "$PKG" = "darwin" ] ; then
-	  sudo cp $TMPDIR/vcn /usr/local/bin && sudo chmod +x /usr/local/bin/vcn
-	fi
+	sudo cp $TMPDIR/vcn /usr/local/bin && sudo chmod +x /usr/local/bin/vcn
 }
 
 cleanup() {
