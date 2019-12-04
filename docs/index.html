@@ -9,15 +9,11 @@ check_curl(){
 	fi
 }
 
-get_latest_version(){
-	V=$(curl --connect-timeout 100 -L -s "https://api.codenotary.io/foundation/v1/version/vcn/latest" | jq '.release')
-}
-
 check_os() {
 	if [ "$ARCH" = "Linux" ] ; then
-		PKG="linux"
+		TARGET="linux-amd64"
 	elif [ "$ARCH" = "Darwin" ] ; then
-		PKG="darwin"
+		TARGET="darwin-10.6-amd64"
 	else
 		echo "Unknown operating system."
 		exit 1
@@ -25,17 +21,13 @@ check_os() {
 }
 
 generate_url(){
-	if [ "$PKG" = "linux" ] ; then
-		URL="https://github.com/vchain-us/vcn/releases/download/$VERSION/vcn-$VERSION-$ARCH-amd64"
-	fi
-
-	if [ "$PKG" = "darwin" ] ; then
-		URL="https://github.com/vchain-us/vcn/releases/download/$VERSION/vcn-$VERSION-$ARCH-10.6-amd64"
-	fi
+	RELASE_URL="https://api.codenotary.io/foundation/v1/version/vcn/latest"
+	curl --connect-timeout 100 -L $RELASE_URL >> release.json
+	VERSION=$(grep -Po '"release":"\K(.*?[^\\])(?=",)' release.json)
+	URL="https://github.com/vchain-us/vcn/releases/download/$VERSION/vcn-$VERSION-$TARGET"
 }
 
 install() {
-	TMPDIR=$(mktemp -d) && cd $TMPDIR
 	curl --connect-timeout 100 -L $URL >> vcn
 	sudo cp $TMPDIR/vcn /usr/local/bin && sudo chmod +x /usr/local/bin/vcn
 }
@@ -46,15 +38,15 @@ cleanup() {
 }
 
 do_install() {
+	TMPDIR=$(mktemp -d) && cd $TMPDIR
 	check_curl
 	check_os
 	echo  "";
 	echo "CodeNotary vcn CLI - Install"
 	echo "----------------------------"
 	echo "- Checking for latest release.." 
-	get_latest_version
-	echo "- Downloading and installing vcn $V for you..."
 	generate_url
+	echo "- Downloading and installing vcn $VERSION for you..."
 	install
 	cleanup
 	echo "";
