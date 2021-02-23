@@ -25,7 +25,7 @@ generate_url(){
 	RELASE_URL="https://api.codenotary.io/foundation/v1/version/vcn/latest"
 	curl --connect-timeout 100 -L $RELASE_URL >> release.json
 	VERSION=$(grep -o '"release": *"[^"]*"' release.json | grep -o '"[^"]*"$' | tr -d '"')
-	URL="https://github.com/vchain-us/vcn/releases/download/$VERSION/vcn-$VERSION-$TARGET"
+	URL="https://github.com/codenotary/vcn/releases/download/$VERSION/vcn-$VERSION-$TARGET"
 	echo "$URL - $VERSION"
 }
 
